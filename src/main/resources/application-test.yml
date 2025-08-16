@@ -1,0 +1,27 @@
+spring:
+  kafka:
+    bootstrap-servers: localhost:29092
+    consumer:
+      group-id: test-fraud-detection-group
+      auto-offset-reset: earliest
+    producer:
+      properties:
+        acks: 1
+        retries: 0
+  
+  redis:
+    host: localhost
+    port: 6380
+
+fraud-detection:
+  topics:
+    transactions: test-transactions
+    fraud-alerts: test-fraud-alerts
+  rules:
+    max-amount-threshold: 5000.00
+    velocity-check-window-minutes: 2
+    max-transactions-per-window: 3
+
+logging:
+  level:
+    com.frauddetection: INFO

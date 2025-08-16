@@ -1,0 +1,64 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: fraud-detection-system
+  
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: fraud-detection-group
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "com.frauddetection.realtime.dto"
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      properties:
+        acks: all
+        retries: 3
+        batch.size: 16384
+        linger.ms: 1
+        buffer.memory: 33554432
+    
+  redis:
+    host: localhost
+    port: 6379
+    timeout: 2000ms
+    jedis:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 0
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+
+fraud-detection:
+  topics:
+    transactions: transactions
+    fraud-alerts: fraud-alerts
+  rules:
+    max-amount-threshold: 10000.00
+    velocity-check-window-minutes: 5
+    max-transactions-per-window: 10
+    suspicious-locations:
+      - "Unknown"
+      - "High Risk Country"
+  redis:
+    key-expiration-hours: 24
+    
+logging:
+  level:
+    com.frauddetection: DEBUG
+    org.springframework.kafka: INFO
